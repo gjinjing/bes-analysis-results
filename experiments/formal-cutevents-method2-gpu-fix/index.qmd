@@ -113,7 +113,9 @@ release repeated fit state.
 
 ## Current interpretation
 
-- The corrected GPU runtime completed the full twenty-start serial workflow.
+- The corrected GPU runtime allowed the serial job to attempt all twenty
+  starting points. Ten starts produced complete optimizer records, and eight
+  of those reported convergence.
 - The spread among successful minima remains substantial, so multi-start
   selection is essential.
 - Visible projection and Dalitz-pull structures should be checked one by one
