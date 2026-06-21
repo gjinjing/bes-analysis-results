@@ -4,5 +4,5 @@ title: "Results"
 
 | Study | Status | Main diagnostic |
 |---|---|---|
+| [Method 2 GPU fix](formal-cutevents-method2-gpu-fix/index.qmd) | Preliminary | 20-start optimizer, memory growth and fit projections |
 | [Formal cutevents baseline](formal-cutevents-example/index.qmd) | Preliminary | Multi-start fit and projection quality |
-

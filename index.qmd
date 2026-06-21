@@ -12,16 +12,18 @@ BESIII collaboration result.
 
 ::: {.grid}
 ::: {.g-col-12 .g-col-lg-7}
-### Joint J/ψ → ωπ⁺π⁻ and J/ψ → ωK⁺K⁻ fit
+### Method 2 GPU fit: J/ψ → ωπ⁺π⁻ and J/ψ → ωK⁺K⁻
 
-The baseline study records multi-start optimizer behavior, dominant fit
-fractions, one-dimensional projections and Dalitz-plot diagnostics.
+The latest study records 20 requested fit starts, optimizer outcomes, resource
+growth, dominant fit fractions, one-dimensional projections and Dalitz-plot
+diagnostics.
 
-[Open the result](experiments/formal-cutevents-example/index.qmd)
+[Open the latest result](experiments/formal-cutevents-method2-gpu-fix/index.qmd)
+· [View the earlier baseline](experiments/formal-cutevents-example/index.qmd)
 :::
 
 ::: {.g-col-12 .g-col-lg-5}
-![](experiments/formal-cutevents-example/assets/generated/optimizer_nll.png){fig-alt="Optimizer outcomes for the baseline fit"}
+![](experiments/formal-cutevents-method2-gpu-fix/assets/generated/optimizer_nll.png){fig-alt="Optimizer outcomes for the latest fit"}
 :::
 :::
 

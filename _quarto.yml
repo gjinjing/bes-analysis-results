@@ -5,6 +5,7 @@ project:
     - index.qmd
     - experiments/index.qmd
     - experiments/formal-cutevents-example/index.qmd
+    - experiments/formal-cutevents-method2-gpu-fix/index.qmd
 
 website:
   title: "BESIII Coupled-Channel Analysis"
@@ -28,4 +29,3 @@ format:
 
 execute:
   freeze: auto
-
