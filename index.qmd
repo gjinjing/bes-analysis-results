@@ -1,0 +1,32 @@
+---
+title: "BESIII Coupled-Channel Analysis"
+subtitle: "Selected fit results and diagnostic plots"
+---
+
+::: {.callout-warning}
+These pages contain preliminary research material and are not an official
+BESIII collaboration result.
+:::
+
+## Current study
+
+::: {.grid}
+::: {.g-col-12 .g-col-lg-7}
+### Joint J/ψ → ωπ⁺π⁻ and J/ψ → ωK⁺K⁻ fit
+
+The baseline study records multi-start optimizer behavior, dominant fit
+fractions, one-dimensional projections and Dalitz-plot diagnostics.
+
+[Open the result](experiments/formal-cutevents-example/index.qmd)
+:::
+
+::: {.g-col-12 .g-col-lg-5}
+![](experiments/formal-cutevents-example/assets/generated/optimizer_nll.png){fig-alt="Optimizer outcomes for the baseline fit"}
+:::
+:::
+
+## Scope
+
+This public site contains selected plots and concise conclusions. Reproducible
+internal records, full logs, configurations, parameter snapshots and input data
+are maintained separately.

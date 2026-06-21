@@ -1,0 +1,8 @@
+---
+title: "Results"
+---
+
+| Study | Status | Main diagnostic |
+|---|---|---|
+| [Formal cutevents baseline](formal-cutevents-example/index.qmd) | Preliminary | Multi-start fit and projection quality |
+

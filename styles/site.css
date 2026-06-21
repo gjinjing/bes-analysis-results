@@ -1,0 +1,17 @@
+:root {
+  --bes-blue: #17365d;
+  --bes-gold: #d89b24;
+}
+
+.navbar {
+  border-bottom: 3px solid var(--bes-gold);
+}
+
+h1, h2, h3 {
+  color: var(--bes-blue);
+}
+
+.quarto-figure img {
+  border-radius: 0.35rem;
+}
+

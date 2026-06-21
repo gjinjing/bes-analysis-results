@@ -1,0 +1,31 @@
+project:
+  type: website
+  output-dir: _site
+  render:
+    - index.qmd
+    - experiments/index.qmd
+    - experiments/formal-cutevents-example/index.qmd
+
+website:
+  title: "BESIII Coupled-Channel Analysis"
+  navbar:
+    left:
+      - href: index.qmd
+        text: Home
+      - href: experiments/index.qmd
+        text: Results
+  search: true
+  page-footer:
+    left: "Preliminary research material — not an official collaboration result."
+
+format:
+  html:
+    theme: cosmo
+    css: styles/site.css
+    toc: true
+    toc-depth: 3
+    link-external-newwindow: true
+
+execute:
+  freeze: auto
+
