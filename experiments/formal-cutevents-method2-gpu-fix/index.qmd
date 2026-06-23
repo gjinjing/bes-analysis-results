@@ -1,24 +1,129 @@
 ---
 title: "Formal cutevents method 2 — GPU fix"
-subtitle: "Two-channel, twenty-start serial GPU fit"
+subtitle: 'Joint $J/\psi\to\omega\pi^+\pi^-$ / $J/\psi\to\omega K^+K^-$ amplitude fit'
 date: 2026-06-20
 ---
 
 ::: {.callout-warning}
-Preliminary result. Numerical values and model components remain subject to
-validation and systematic studies.
+Preliminary working result. This page is a model and diagnostic record for the
+GPU-fixed fit, not a validated final physics result.
 :::
 
 ## Overview
 
-This update studies the joint J/ψ → ωπ⁺π⁻ and J/ψ → ωK⁺K⁻ fit after
-initializing the GPU-enabled runtime consistently. Twenty starting points were
-requested in one serial job. The run completed normally after about 25 hours.
+This page summarizes the `Formal_cutevents_method2_gpu_fix` fit result for the
+two-channel coupled analysis. The run used `MultiConfig(total_same=False)`: the
+same $J/\psi\to\omega R$ production variables and selected line-shape
+parameters can be shared across the two final states, while full-chain complex
+coefficients remain channel-specific.
 
-Ten starts produced complete optimizer records: eight reported convergence and
-two reported precision loss. The best explicitly converged record was start 19,
-with NLL **−14273.2392**. Starts without a complete record are not shown in the
-optimizer plot and still need individual follow-up.
+| Item | Value |
+|---|---:|
+| Condor cluster | `12984995` |
+| Requested starts | 20 |
+| Complete optimizer records | 10 |
+| Converged optimizer records | 8 |
+| Selected record | start 19 |
+| Best converged NLL | **-14273.239183** |
+| Floating parameters | 108 |
+| Saved parameters | 270 |
+| Fit-script elapsed time | 25 h 02 min 15 s |
+| Peak resident memory | 18.20 GiB |
+| Imported figures | 32 |
+
+Ten starts left complete optimizer summaries. Eight converged, while two
+reported precision loss. The selected converged start 19 is lower than the next
+converged minimum by $\Delta\mathrm{NLL}=15.12$, so the result still depends
+meaningfully on multi-start selection.
+
+## Data and likelihood
+
+| Channel | Data entries | Sum of sWeights | Normalization PHSP | Treatment |
+|---|---:|---:|---:|---|
+| $\omega\pi^+\pi^-$ | 65,696 | 31,549.44 | 519,946 reconstructed events | p6C sample, sWeighted |
+| $\omega K^+K^-$ | 65,696 | 45,276.64 | 429,521 reconstructed events | sWeighted |
+
+Both likelihood terms use reconstructed and selected PHSP for normalization.
+The $\omega K^+K^-$ channel enables tf-pwa `cached_shape`; the
+$\omega\pi^+\pi^-$ channel uses the standard amplitude path. Both use
+center-of-mass kinematics, `r_boost: true`, TensorFlow graph execution and 200
+plotting bins.
+
+For channel $c$, the fitted intensity is built from coherent active decay
+chains,
+
+$$
+\mathcal A_c(x)=\sum_r c_{c,r}\,\mathcal M_{c,r}
+  (x;\theta_c,\theta_{\rm shared}),\qquad
+I_c(x)=\sum_{\rm helicities}|\mathcal A_c(x)|^2.
+$$
+
+The two normalized, sWeight likelihood terms are added,
+
+$$
+-\log\mathcal L_{\rm joint}
+=\sum_c\alpha_c\left[-\sum_{i\in D_c}w_{ci}\log I_c(x_{ci})
++\left(\sum_{i\in D_c}w_{ci}\right)\log\widehat{\mathcal N}_c\right],
+$$
+
+$$
+\alpha_c=\frac{\sum_i w_{ci}}{\sum_i w_{ci}^2},\qquad
+\widehat{\mathcal N}_c=
+\frac{\sum_{j\in {\rm PHSP}_c}v_{cj}I_c(y_{cj})}{\sum_j v_{cj}}.
+$$
+
+Ordinary resonances use tf-pwa's default relativistic Breit-Wigner with running
+width. Nonresonant states configured with `model: one` use a constant line
+shape. The shared $f_0(980)$ and $f_2(1270)$ use the configured two-channel
+Flatte form with $\pi\pi$ and $K\bar K$ thresholds.
+
+## Active amplitude model
+
+### $\omega\pi^+\pi^-$: 15 coherent chains
+
+| Subsystem | Active states |
+|---|---|
+| $\omega\pi^+$ | $b_1(1235)^+$, nonresonant $0^-$, $\rho(1450)^+$, $\rho(1690)^+$ |
+| $\omega\pi^-$ | charge-conjugate partners of the four $\omega\pi^+$ states |
+| $\pi^+\pi^-$ | nonresonant $2^+$, $f_0(500)$, $f_0(980)$ Flatte, $f_2(1270)$ Flatte, $f_0(1370)$, $f_0(1500)$, $f_2(2300)$ |
+
+The configured $f_0(1525)\to\pi\pi$ chain is rejected by tf-pwa's LS check
+and is not active. The commented $\rho(1570)$ and $f_0(1710)$ hypotheses are
+also inactive.
+
+### $\omega K^+K^-$: 12 coherent chains
+
+| Subsystem | Active states |
+|---|---|
+| $\omega K^+$ | $K_2(2250)^+$, $K_1(1400)^+$ |
+| $\omega K^-$ | $K_2(2250)^-$, $K_1(1400)^-$ |
+| $K^+K^-$ | nonresonant $0^+$, $f_0(980)$ Flatte, $f_2(1270)$ Flatte, $f_0(1370)$, $f_0(1500)$, $f_2(1525)$, $f_0(1710)$, $f_2(2150)$ |
+
+### Cross-channel sharing
+
+| Shared resonance family | Shared between channels | Still channel-specific |
+|---|---|---|
+| $f_0(980)$ | $J/\psi\to\omega f_0(980)$ production LS variables, Flatte mass and $g_{\pi\pi}, g_{K\bar K}$ | Full-chain complex totals for $f_0(980)\to\pi\pi$ and $f_0(980)\to K\bar K$ |
+| $f_2(1270)$ | $J/\psi\to\omega f_2(1270)$ production LS variables, Flatte mass and $g_{\pi\pi}, g_{K\bar K}$ | Full-chain complex totals for $f_2(1270)\to\pi\pi$ and $f_2(1270)\to K\bar K$ |
+| $f_0(1370)$ | $J/\psi\to\omega f_0(1370)$ production LS variables, fixed mass and width | Full-chain complex totals for $\pi\pi$ and $K\bar K$ decays |
+| $f_0(1500)$ | $J/\psi\to\omega f_0(1500)$ production LS variables, fixed mass and width | Full-chain complex totals for $\pi\pi$ and $K\bar K$ decays |
+
+Parameter accounting from the imported model inventory:
+
+| Scope | Total | Floating | Fixed or derived |
+|---|---:|---:|---:|
+| Shared by both channels | 32 | 18 | 14 |
+| $\omega\pi^+\pi^-$ only | 124 | 46 | 78 |
+| $\omega K^+K^-$ only | 114 | 44 | 70 |
+| **Combined** | **270** | **108** | **162** |
+
+The other active families are not shared across final states in this fit:
+$f_0(500)$, $f_2(2300)$, the $\omega\pi$ isobars and the $\pi\pi$
+nonresonant term appear only in $\omega\pi^+\pi^-$; $f_2(1525)$,
+$f_0(1710)$, $f_2(2150)$, the $\omega K$ isobars and the $K\bar K$
+nonresonant term appear only in $\omega K^+K^-$. Charge-conjugate
+$\omega\pi$ and $\omega K$ partners are tied through `coef_head` and
+explicit `var_equal` relations.
 
 ## Optimizer and resource diagnostics
 
@@ -38,10 +143,30 @@ release repeated fit state.
 :::
 :::
 
+## Fit outcome
+
+Diagonal fit fractions include interference and need not sum to one. Their
+sums are 1.586 for $\omega\pi^+\pi^-$ and 1.097 for $\omega K^+K^-$. The
+large $\omega\pi\pi$ sum indicates substantial destructive interference.
+
+| Channel | Leading diagonal fractions |
+|---|---|
+| $\omega\pi^+\pi^-$ | $f_2(1270)$ 34.5%, $f_2(2300)$ 24.5%, NR $2^+$ 20.0%, $f_0(500)$ 16.1%, about 14.4% for each $b_1(1235)^\pm$ chain |
+| $\omega K^+K^-$ | $f_0(980)$ 35.1%, $f_0(1710)$ 15.7%, $f_2(2150)$ 13.2%, NR $0^+$ 11.1%, $f_2(1270)$ 8.1% |
+
+::: {.grid}
+::: {.g-col-12 .g-col-lg-6}
+![](assets/generated/fit_fractions_channel0.png){fig-alt="Largest omega pi pi diagonal fit fractions"}
+:::
+::: {.g-col-12 .g-col-lg-6}
+![](assets/generated/fit_fractions_channel1.png){fig-alt="Largest omega K K diagonal fit fractions"}
+:::
+:::
+
 ## Main projections
 
 ::: {.panel-tabset}
-### ωπ⁺π⁻
+### $\omega\pi^+\pi^-$
 
 ::: {.grid}
 ::: {.g-col-12 .g-col-lg-4}
@@ -55,7 +180,7 @@ release repeated fit state.
 :::
 :::
 
-### ωK⁺K⁻
+### $\omega K^+K^-$
 
 ::: {.grid}
 ::: {.g-col-12 .g-col-lg-4}
@@ -72,53 +197,242 @@ release repeated fit state.
 
 ## Dalitz diagnostics
 
-### ωπ⁺π⁻
+### $\omega\pi^+\pi^-$
 
 ::: {.grid}
 ::: {.g-col-12 .g-col-lg-4}
-![](assets/figures/s0_dalitz_omegaPip_PipPim_data_hist.png){fig-alt="Channel zero Dalitz data"}
+![](assets/figures/s0_dalitz_omegaPip_PipPim_data_hist.png){fig-alt="omega pi pi Dalitz data"}
 :::
 ::: {.g-col-12 .g-col-lg-4}
-![](assets/figures/s0_dalitz_omegaPip_PipPim_fitted.png){fig-alt="Channel zero fitted Dalitz distribution"}
+![](assets/figures/s0_dalitz_omegaPip_PipPim_fitted.png){fig-alt="omega pi pi fitted Dalitz distribution"}
 :::
 ::: {.g-col-12 .g-col-lg-4}
-![](assets/figures/s0_dalitz_omegaPip_PipPim_pull.png){fig-alt="Channel zero Dalitz pull"}
+![](assets/figures/s0_dalitz_omegaPip_PipPim_pull.png){fig-alt="omega pi pi Dalitz pull"}
 :::
 :::
 
-### ωK⁺K⁻
+### $\omega K^+K^-$
 
 ::: {.grid}
 ::: {.g-col-12 .g-col-lg-4}
-![](assets/figures/s1_dalitz_omegaKp_KpKm_data_hist.png){fig-alt="Channel one Dalitz data"}
+![](assets/figures/s1_dalitz_omegaKp_KpKm_data_hist.png){fig-alt="omega K K Dalitz data"}
 :::
 ::: {.g-col-12 .g-col-lg-4}
-![](assets/figures/s1_dalitz_omegaKp_KpKm_fitted.png){fig-alt="Channel one fitted Dalitz distribution"}
+![](assets/figures/s1_dalitz_omegaKp_KpKm_fitted.png){fig-alt="omega K K fitted Dalitz distribution"}
 :::
 ::: {.g-col-12 .g-col-lg-4}
-![](assets/figures/s1_dalitz_omegaKp_KpKm_pull.png){fig-alt="Channel one Dalitz pull"}
+![](assets/figures/s1_dalitz_omegaKp_KpKm_pull.png){fig-alt="omega K K Dalitz pull"}
 :::
 :::
 
-## Dominant diagonal fit fractions
+## Fit quality
 
+This snapshot is technically successful: the GPU-fixed job completed normally,
+the selected optimizer record converged, the selected NLL is the best recovered
+minimum, and the page contains the expected optimizer, memory, fit-fraction,
+mass-projection and Dalitz diagnostic figures.
+
+The weak points are still limiting. Only 10 of the 20 requested starts left
+complete optimizer summaries, two of those reported precision loss, and the
+converged minima remain separated by tens to hundreds of NLL units. The large
+$\omega\pi\pi$ diagonal-fraction sum means the interpretation is strongly
+interference dominated. No binned $\chi^2$, full covariance matrix, closure
+result or systematic variation is available here, so this should remain a
+working reference rather than a quoted physics result.
+
+## Full figure gallery
+
+This is the complete imported selected-fit gallery: mass and angular
+projections, Dalitz data/fitted/pull triplets, and component legends for both
+channels.
+
+### $\omega\pi^+\pi^-$ channel
 ::: {.grid}
-::: {.g-col-12 .g-col-lg-6}
-![](assets/generated/fit_fractions_channel0.png){fig-alt="Largest channel zero diagonal fit fractions"}
+::: {.g-col-12 .g-col-md-6 .g-col-xl-4}
+![](<assets/figures/s0_Jpsi_bp_pip_alpha.png>){fig-alt="omega pi pi Jpsi bp pip alpha"}
+
+`s0_Jpsi_bp_pip_alpha.png`
 :::
-::: {.g-col-12 .g-col-lg-6}
-![](assets/generated/fit_fractions_channel1.png){fig-alt="Largest channel one diagonal fit fractions"}
+::: {.g-col-12 .g-col-md-6 .g-col-xl-4}
+![](<assets/figures/s0_Jpsi_bp_pip_cos(beta).png>){fig-alt="omega pi pi Jpsi bp pip cos(beta)"}
+
+`s0_Jpsi_bp_pip_cos(beta).png`
+:::
+::: {.g-col-12 .g-col-md-6 .g-col-xl-4}
+![](<assets/figures/s0_Jpsi_pipi_pip_cos(beta).png>){fig-alt="omega pi pi Jpsi pipi pip cos(beta)"}
+
+`s0_Jpsi_pipi_pip_cos(beta).png`
+:::
+::: {.g-col-12 .g-col-md-6 .g-col-xl-4}
+![](<assets/figures/s0_dalitz_omegaPim_PipPim_data_hist.png>){fig-alt="omega pi pi dalitz omegaPim PipPim data hist"}
+
+`s0_dalitz_omegaPim_PipPim_data_hist.png`
+:::
+::: {.g-col-12 .g-col-md-6 .g-col-xl-4}
+![](<assets/figures/s0_dalitz_omegaPim_PipPim_fitted.png>){fig-alt="omega pi pi dalitz omegaPim PipPim fitted"}
+
+`s0_dalitz_omegaPim_PipPim_fitted.png`
+:::
+::: {.g-col-12 .g-col-md-6 .g-col-xl-4}
+![](<assets/figures/s0_dalitz_omegaPim_PipPim_pull.png>){fig-alt="omega pi pi dalitz omegaPim PipPim pull"}
+
+`s0_dalitz_omegaPim_PipPim_pull.png`
+:::
+::: {.g-col-12 .g-col-md-6 .g-col-xl-4}
+![](<assets/figures/s0_dalitz_omegaPip_PipPim_data_hist.png>){fig-alt="omega pi pi dalitz omegaPip PipPim data hist"}
+
+`s0_dalitz_omegaPip_PipPim_data_hist.png`
+:::
+::: {.g-col-12 .g-col-md-6 .g-col-xl-4}
+![](<assets/figures/s0_dalitz_omegaPip_PipPim_fitted.png>){fig-alt="omega pi pi dalitz omegaPip PipPim fitted"}
+
+`s0_dalitz_omegaPip_PipPim_fitted.png`
+:::
+::: {.g-col-12 .g-col-md-6 .g-col-xl-4}
+![](<assets/figures/s0_dalitz_omegaPip_PipPim_pull.png>){fig-alt="omega pi pi dalitz omegaPip PipPim pull"}
+
+`s0_dalitz_omegaPip_PipPim_pull.png`
+:::
+::: {.g-col-12 .g-col-md-6 .g-col-xl-4}
+![](<assets/figures/s0_dalitz_omegaPip_omegaPim_data_hist.png>){fig-alt="omega pi pi dalitz omegaPip omegaPim data hist"}
+
+`s0_dalitz_omegaPip_omegaPim_data_hist.png`
+:::
+::: {.g-col-12 .g-col-md-6 .g-col-xl-4}
+![](<assets/figures/s0_dalitz_omegaPip_omegaPim_fitted.png>){fig-alt="omega pi pi dalitz omegaPip omegaPim fitted"}
+
+`s0_dalitz_omegaPip_omegaPim_fitted.png`
+:::
+::: {.g-col-12 .g-col-md-6 .g-col-xl-4}
+![](<assets/figures/s0_dalitz_omegaPip_omegaPim_pull.png>){fig-alt="omega pi pi dalitz omegaPip omegaPim pull"}
+
+`s0_dalitz_omegaPip_omegaPim_pull.png`
+:::
+::: {.g-col-12 .g-col-md-6 .g-col-xl-4}
+![](<assets/figures/s0_legend.png>){fig-alt="omega pi pi legend"}
+
+`s0_legend.png`
+:::
+::: {.g-col-12 .g-col-md-6 .g-col-xl-4}
+![](<assets/figures/s0_m_bm.png>){fig-alt="omega pi pi m bm"}
+
+`s0_m_bm.png`
+:::
+::: {.g-col-12 .g-col-md-6 .g-col-xl-4}
+![](<assets/figures/s0_m_bp.png>){fig-alt="omega pi pi m bp"}
+
+`s0_m_bp.png`
+:::
+::: {.g-col-12 .g-col-md-6 .g-col-xl-4}
+![](<assets/figures/s0_m_pipi.png>){fig-alt="omega pi pi m pipi"}
+
+`s0_m_pipi.png`
 :::
 :::
 
-## Current interpretation
 
-- The corrected GPU runtime allowed the serial job to attempt all twenty
-  starting points. Ten starts produced complete optimizer records, and eight
-  of those reported convergence.
-- The spread among successful minima remains substantial, so multi-start
-  selection is essential.
-- Visible projection and Dalitz-pull structures should be checked one by one
-  before physics interpretation.
-- The monotonic memory growth is operational rather than a physics conclusion;
-  independent jobs are the preferred design for the next scan.
+### $\omega K^+K^-$ channel
+::: {.grid}
+::: {.g-col-12 .g-col-md-6 .g-col-xl-4}
+![](<assets/figures/s1_Jpsi_kk_kp_cos(beta).png>){fig-alt="omega K K Jpsi kk kp cos(beta)"}
+
+`s1_Jpsi_kk_kp_cos(beta).png`
+:::
+::: {.g-col-12 .g-col-md-6 .g-col-xl-4}
+![](<assets/figures/s1_Jpsi_kstp_kp_alpha.png>){fig-alt="omega K K Jpsi kstp kp alpha"}
+
+`s1_Jpsi_kstp_kp_alpha.png`
+:::
+::: {.g-col-12 .g-col-md-6 .g-col-xl-4}
+![](<assets/figures/s1_Jpsi_kstp_kp_cos(beta).png>){fig-alt="omega K K Jpsi kstp kp cos(beta)"}
+
+`s1_Jpsi_kstp_kp_cos(beta).png`
+:::
+::: {.g-col-12 .g-col-md-6 .g-col-xl-4}
+![](<assets/figures/s1_dalitz_omegaKm_KpKm_data_hist.png>){fig-alt="omega K K dalitz omegaKm KpKm data hist"}
+
+`s1_dalitz_omegaKm_KpKm_data_hist.png`
+:::
+::: {.g-col-12 .g-col-md-6 .g-col-xl-4}
+![](<assets/figures/s1_dalitz_omegaKm_KpKm_fitted.png>){fig-alt="omega K K dalitz omegaKm KpKm fitted"}
+
+`s1_dalitz_omegaKm_KpKm_fitted.png`
+:::
+::: {.g-col-12 .g-col-md-6 .g-col-xl-4}
+![](<assets/figures/s1_dalitz_omegaKm_KpKm_pull.png>){fig-alt="omega K K dalitz omegaKm KpKm pull"}
+
+`s1_dalitz_omegaKm_KpKm_pull.png`
+:::
+::: {.g-col-12 .g-col-md-6 .g-col-xl-4}
+![](<assets/figures/s1_dalitz_omegaKp_KpKm_data_hist.png>){fig-alt="omega K K dalitz omegaKp KpKm data hist"}
+
+`s1_dalitz_omegaKp_KpKm_data_hist.png`
+:::
+::: {.g-col-12 .g-col-md-6 .g-col-xl-4}
+![](<assets/figures/s1_dalitz_omegaKp_KpKm_fitted.png>){fig-alt="omega K K dalitz omegaKp KpKm fitted"}
+
+`s1_dalitz_omegaKp_KpKm_fitted.png`
+:::
+::: {.g-col-12 .g-col-md-6 .g-col-xl-4}
+![](<assets/figures/s1_dalitz_omegaKp_KpKm_pull.png>){fig-alt="omega K K dalitz omegaKp KpKm pull"}
+
+`s1_dalitz_omegaKp_KpKm_pull.png`
+:::
+::: {.g-col-12 .g-col-md-6 .g-col-xl-4}
+![](<assets/figures/s1_dalitz_omegaKp_omegaKm_data_hist.png>){fig-alt="omega K K dalitz omegaKp omegaKm data hist"}
+
+`s1_dalitz_omegaKp_omegaKm_data_hist.png`
+:::
+::: {.g-col-12 .g-col-md-6 .g-col-xl-4}
+![](<assets/figures/s1_dalitz_omegaKp_omegaKm_fitted.png>){fig-alt="omega K K dalitz omegaKp omegaKm fitted"}
+
+`s1_dalitz_omegaKp_omegaKm_fitted.png`
+:::
+::: {.g-col-12 .g-col-md-6 .g-col-xl-4}
+![](<assets/figures/s1_dalitz_omegaKp_omegaKm_pull.png>){fig-alt="omega K K dalitz omegaKp omegaKm pull"}
+
+`s1_dalitz_omegaKp_omegaKm_pull.png`
+:::
+::: {.g-col-12 .g-col-md-6 .g-col-xl-4}
+![](<assets/figures/s1_legend.png>){fig-alt="omega K K legend"}
+
+`s1_legend.png`
+:::
+::: {.g-col-12 .g-col-md-6 .g-col-xl-4}
+![](<assets/figures/s1_m_kk.png>){fig-alt="omega K K m kk"}
+
+`s1_m_kk.png`
+:::
+::: {.g-col-12 .g-col-md-6 .g-col-xl-4}
+![](<assets/figures/s1_m_kstm.png>){fig-alt="omega K K m kstm"}
+
+`s1_m_kstm.png`
+:::
+::: {.g-col-12 .g-col-md-6 .g-col-xl-4}
+![](<assets/figures/s1_m_kstp.png>){fig-alt="omega K K m kstp"}
+
+`s1_m_kstp.png`
+:::
+:::
+
+
+## Next adjustments
+
+1. Import and inspect the reconstructed-PHSP-matched closure cluster `127055`
+   outputs. It was submitted on 2026-06-22; `condor_q 127055` showed no active
+   jobs on 2026-06-23, so the next action is to check the logs and result
+   files rather than assume it is still queued.
+2. Require the truth-start closure fit to recover generated projections and
+   identifiable parameters, then run independent toy seeds for pull coverage.
+3. Compute a full numerical Hessian/covariance and inspect correlations,
+   eigenvalues and boundary solutions. The current fraction errors are not a
+   final statistical uncertainty statement.
+4. Supply genuine no-efficiency PHSP for both channels before quoting
+   physics-level fit fractions; the current normalization folds detector
+   acceptance into the reported fractions.
+5. Run resonance-removal and alternative-line-shape fits. Report
+   $\Delta\mathrm{NLL}$, the change in degrees of freedom and whether the
+   result is stable under repeated multi-start scans.
+6. Split future starts into independent jobs to improve throughput and memory
+   isolation, then promote only a closure-checked and systematic-checked result
+   to a new dated page.
